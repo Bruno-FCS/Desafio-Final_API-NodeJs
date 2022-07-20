@@ -117,6 +117,7 @@ exports.insert = (req, res) => {
 
 exports.updateData = (req, res) => {
   const vehicledata = req.body;
+  req.body.vehicledata_vin = formatVin(req.body.vehicledata_vin);
 
   mysql.getConnection((error, conn) => {
     if (error) {
