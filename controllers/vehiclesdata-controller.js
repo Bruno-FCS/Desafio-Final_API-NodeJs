@@ -1,4 +1,5 @@
 const mysql = require("../mysql").pool;
+const formatVin = require("../utils/formatVin");
 
 exports.findAll = (req, res) => {
   mysql.getConnection((error, conn) => {
@@ -18,9 +19,9 @@ exports.findAll = (req, res) => {
 };
 
 exports.findByVin = (req, res) => {
-  const vehicledata_vin = String.prototype.toUpperCase(
-    req.params.vehicledata_vin
-  );
+  const vehicledata_vin = formatVin(req.params.vehicledata_vin)
+    .toUpperCase()
+    .replaceAll('"', "");
 
   mysql.getConnection((error, conn) => {
     if (error) {
@@ -77,7 +78,7 @@ exports.insert = (req, res) => {
     }
     conn.query(
       "SELECT * FROM Vehicle_Data WHERE vehicledata_vin = ?",
-      [String.prototype.toUpperCase(vehicledata.vehicledata_vin)],
+      [formatVin(vehicledata.vehicledata_vin)],
       (error, result) => {
         if (error) {
           conn.release();
@@ -87,7 +88,7 @@ exports.insert = (req, res) => {
           conn.query(
             "INSERT INTO Vehicle_Data (vehicledata_vin, vehicledata_odometer, vehicledata_tire_pressure, vehicledata_status, vehicledata_battery_status, vehicledata_fuel_level, vehicledata_lat, vehicledata_long) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             [
-              String.prototype.toUpperCase(vehicledata.vehicledata_vin),
+              formatVin(vehicledata.vehicledata_vin),
               vehicledata.vehicledata_odometer,
               vehicledata.vehicledata_tire_pressure,
               vehicledata.vehicledata_status,
@@ -123,7 +124,7 @@ exports.updateData = (req, res) => {
     }
     conn.query(
       "SELECT * FROM Vehicle_Data WHERE vehicledata_vin = ?",
-      [String.prototype.toUpperCase(vehicledata.vehicledata_vin)],
+      [formatVin(vehicledata.vehicledata_vin)],
       (error, result) => {
         if (error) {
           conn.release();
@@ -132,10 +133,7 @@ exports.updateData = (req, res) => {
         if (result.length == 1) {
           conn.query(
             "UPDATE Vehicle_Data SET ? WHERE vehicledata_vin = ?",
-            [
-              req.body,
-              String.prototype.toUpperCase(vehicledata.vehicledata_vin),
-            ],
+            [req.body, formatVin(vehicledata.vehicledata_vin)],
             (error) => {
               conn.release();
 
@@ -165,7 +163,7 @@ exports.update = (req, res) => {
     }
     conn.query(
       "SELECT * FROM Vehicle_Data WHERE vehicledata_vin = ?",
-      [String.prototype.toUpperCase(vehicledata.vehicledata_vin)],
+      [formatVin(vehicledata.vehicledata_vin)],
       (error, result) => {
         if (error) {
           conn.release();
@@ -214,9 +212,7 @@ exports.update = (req, res) => {
 };
 
 exports.deleteByVin = (req, res) => {
-  const vehicledata_vin = String.prototype.toUpperCase(
-    req.params.vehicledata_vin
-  );
+  const vehicledata_vin = formatVin(req.params.vehicledata_vin);
 
   mysql.getConnection((error, conn) => {
     if (error) {
